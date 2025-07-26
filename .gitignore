@@ -1,0 +1,54 @@
+# Docker and container files
+docker-compose.override.yml
+.env
+.env.local
+
+# Grafana data and plugins
+grafana/data/
+grafana/plugins/
+grafana/logs/
+
+# Prometheus data
+prometheus/data/
+
+# Alertmanager data
+alertmanager/data/
+
+# Logs
+*.log
+logs/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+tmp/
+temp/
+.tmp
+
+# Backup files
+*.bak
+*.backup
+
+# SSL certificates (if self-generated)
+certs/*.crt
+certs/*.key
+certs/*.pem
+
+# Configuration overrides (keep templates, ignore actual configs with secrets)
+**/secrets/
+**/*.secret
+**/*.key
