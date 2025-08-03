@@ -56,7 +56,9 @@ services:
     networks:
       - monitoring
 
-  # Node Exporter - System metrics collector for host monitoring
+  # Node Exporter - System metrics collector 
+  # NOTE: On macOS, this monitors Docker Desktop VM, not the macOS host
+  # For actual macOS monitoring, install Node Exporter natively with: brew install node_exporter
   node-exporter:
     image: prom/node-exporter:latest
     container_name: node-exporter
@@ -67,13 +69,16 @@ services:
       - '--path.procfs=/host/proc'
       - '--path.rootfs=/rootfs'
       - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)'
+      - '--collector.filesystem.ignored-fs-types=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$$'
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /:/rootfs:ro
+      - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro
     networks:
       - monitoring
+    pid: host
 
 volumes:
   prometheus_data:

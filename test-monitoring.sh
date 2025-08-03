@@ -18,6 +18,8 @@ echo ""
 echo "3️⃣ Testing Node Exporter metrics..."
 METRICS_COUNT=$(curl -s http://localhost:9100/metrics | wc -l)
 echo "Node Exporter is exposing $METRICS_COUNT metrics"
+echo "📝 NOTE: On macOS, this monitors Docker Desktop VM, not macOS host"
+echo "📝 For actual macOS monitoring, install: brew install node_exporter"
 echo ""
 
 # Test 4: Test Prometheus query for CPU usage
