@@ -1,10 +1,5 @@
 global:
-  scrape_in  # Node Exporter for host system monitoring
-  - job_name: 'node-exporter'
-    static_configs:
-      - targets: ['node-exporter:9100']
-    scrape_interval: 15s
-    metrics_path: /metrics: 15s
+  scrape_interval: 15s
   evaluation_interval: 15s
 
 rule_files:
@@ -22,10 +17,18 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 
-  # Node Exporter for host monitoring
-  - job_name: 'node-exporter'
+  # Node Exporter for Docker VM monitoring
+  - job_name: 'node-exporter-docker'
     static_configs:
       - targets: ['node-exporter:9100']
+    scrape_interval: 15s
+    metrics_path: /metrics
+
+  # Node Exporter for native macOS monitoring
+  # Run with: node_exporter --web.listen-address=":9101"
+  - job_name: 'node-exporter-macos'
+    static_configs:
+      - targets: ['host.docker.internal:9101']
     scrape_interval: 15s
     metrics_path: /metrics
 
