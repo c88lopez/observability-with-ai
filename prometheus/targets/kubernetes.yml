@@ -1,0 +1,13 @@
+# Kubernetes targets for monitoring
+# Will be populated in Phase 2 if Kubernetes cluster is available
+#
+# Example:
+# - targets:
+#     - 'kube-state-metrics:8080'
+#     - 'kubelet:10250'
+#   labels:
+#     service: 'kubernetes'
+#     cluster: 'development'
+
+# For now, empty - will be populated in Phase 2
+[]

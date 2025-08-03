@@ -1,0 +1,13 @@
+# Database targets for monitoring
+# Will be populated in Phase 2 when we add database exporters
+#
+# Example:
+# - targets:
+#     - 'mysql-exporter:9104'
+#     - 'postgres-exporter:9187'
+#   labels:
+#     service: 'database'
+#     environment: 'development'
+
+# For now, empty - will be populated in Phase 2
+[]
