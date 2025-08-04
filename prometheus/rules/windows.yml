@@ -1,0 +1,57 @@
+groups:
+  - name: windows-alerts
+    rules:
+      # High CPU usage alert for Windows
+      - alert: WindowsHighCPUUsage
+        expr: 100 - (avg by(instance) (rate(windows_cpu_time_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+          component: windows
+        annotations:
+          summary: "High CPU usage detected on Windows machine {{ $labels.instance }}"
+          description: "CPU usage is above 80% on {{ $labels.instance }} for more than 5 minutes. Current value: {{ $value }}%"
+
+      # High memory usage alert for Windows
+      - alert: WindowsHighMemoryUsage
+        expr: (1 - (windows_os_physical_memory_free_bytes / windows_cs_physical_memory_bytes)) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          component: windows
+        annotations:
+          summary: "High memory usage detected on Windows machine {{ $labels.instance }}"
+          description: "Memory usage is above 85% on {{ $labels.instance }}. Current usage: {{ $value }}%"
+
+      # Low disk space alert for Windows
+      - alert: WindowsLowDiskSpace
+        expr: (1 - (windows_logical_disk_free_bytes / windows_logical_disk_size_bytes)) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          component: windows
+        annotations:
+          summary: "Low disk space detected on Windows machine {{ $labels.instance }}"
+          description: "Disk {{ $labels.volume }} has more than 85% usage on {{ $labels.instance }}. Current usage: {{ $value }}%"
+
+      # Windows service down alert
+      - alert: WindowsServiceDown
+        expr: windows_service_state{state="running"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          component: windows
+        annotations:
+          summary: "Windows service {{ $labels.name }} is not running on {{ $labels.instance }}"
+          description: "The Windows service {{ $labels.name }} has stopped running on {{ $labels.instance }}"
+
+      # Windows Exporter down alert
+      - alert: WindowsExporterDown
+        expr: up{job="windows-exporter"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: windows
+        annotations:
+          summary: "Windows Exporter is down on {{ $labels.instance }}"
+          description: "Windows Exporter has been down for more than 1 minute on {{ $labels.instance }}"

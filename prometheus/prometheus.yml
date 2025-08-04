@@ -32,6 +32,13 @@ scrape_configs:
     scrape_interval: 15s
     metrics_path: /metrics
 
+  # Windows Exporter for Windows machine monitoring
+  - job_name: 'windows-exporter'
+    static_configs:
+      - targets: ['192.168.68.55:9182']
+    scrape_interval: 15s
+    metrics_path: /metrics
+
   # File-based service discovery for additional hosts
   - job_name: 'hosts'
     file_sd_configs:
