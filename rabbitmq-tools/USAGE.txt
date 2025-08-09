@@ -1,0 +1,34 @@
+Unified RabbitMQ load tool (produce / consume)
+
+Usage:
+  {{prog}} [flags]
+
+Core:
+  --mode produce|consume   Select producer or consumer role (aliases: pub, publisher, sub, consumer)
+  --queue <name>           Queue name (created if producing)
+  --count <n>              Produce: messages to publish; Consume: messages to read (0=infinite)
+
+Produce flags:
+  --exchange <ex>          Exchange (blank=default)
+  --routing <key>          Routing key (default=queue if blank)
+  --batch <n>              Log progress every n messages (default 1000)
+  --size <bytes>           Pad payload to this size (default dynamic small)
+  --concurrency <n>        Publisher goroutines (default 1)
+
+Consume flags:
+  --ack                    Enable manual acks (default true; set --ack=false to auto-ack)
+  --prefetch <n>           Prefetch (QoS) count (0 = unlimited)
+
+General:
+  --url <amqp_url>         AMQP URL (env RABBITMQ_URL supersedes)
+  --help                   Show this help and exit
+
+Environment:
+  RABBITMQ_URL             Connection URL override
+  RANDOM_SEED              Deterministic random payload seed
+
+Examples:
+  Produce 10k (5 workers, 512B payload):
+    {{prog}} --mode=produce --queue=loadq --count=10000 --concurrency=5 --size=512
+  Consume indefinitely with prefetch 50 auto-ack:
+    {{prog}} --mode=consume --queue=loadq --count=0 --ack=false --prefetch=50
