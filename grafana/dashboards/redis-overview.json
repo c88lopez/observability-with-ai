@@ -1,0 +1,20 @@
+{
+  "id": null,
+  "uid": "redis-overview",
+  "title": "Redis Overview",
+  "tags": ["cache", "redis"],
+  "schemaVersion": 36,
+  "version": 1,
+  "refresh": "30s",
+  "panels": [
+    {"type": "stat", "title": "Redis Up", "id": 1, "gridPos": {"h":4,"w":4,"x":0,"y":0}, "datasource": {"type":"prometheus","uid":"prometheus"}, "targets": [{"expr": "redis_up", "refId": "A"}]},
+    {"type": "timeseries", "title": "Connected Clients", "id": 2, "gridPos": {"h":6,"w":8,"x":4,"y":0}, "datasource":{"type":"prometheus","uid":"prometheus"}, "targets": [{"expr": "redis_connected_clients", "refId": "A", "legendFormat": "clients"}]},
+    {"type": "timeseries", "title": "Memory Usage", "id": 3, "gridPos": {"h":6,"w":8,"x":12,"y":0}, "datasource":{"type":"prometheus","uid":"prometheus"}, "targets": [{"expr": "redis_memory_used_bytes", "refId": "A", "legendFormat": "used"}], "fieldConfig": {"defaults": {"unit": "bytes"}}},
+    {"type": "timeseries", "title": "Commands/sec", "id": 4, "gridPos": {"h":6,"w":8,"x":20,"y":0}, "datasource":{"type":"prometheus","uid":"prometheus"}, "targets": [{"expr": "rate(redis_commands_processed_total[5m])", "refId": "A", "legendFormat": "commands/sec"}]},
+    {"type": "timeseries", "title": "Hit Ratio %", "id": 5, "gridPos": {"h":6,"w":8,"x":0,"y":6}, "datasource":{"type":"prometheus","uid":"prometheus"}, "targets": [{"expr": "(redis_keyspace_hits_total / (redis_keyspace_hits_total + redis_keyspace_misses_total)) * 100", "refId": "A", "legendFormat": "hit ratio"}], "fieldConfig": {"defaults": {"unit": "percent"}}},
+    {"type": "timeseries", "title": "Blocked Clients", "id": 6, "gridPos": {"h":6,"w":8,"x":8,"y":6}, "datasource":{"type":"prometheus","uid":"prometheus"}, "targets": [{"expr": "redis_blocked_clients", "refId": "A", "legendFormat": "blocked"}]},
+    {"type": "timeseries", "title": "Evicted / Expired Keys", "id": 7, "gridPos": {"h":6,"w":8,"x":16,"y":6}, "datasource":{"type":"prometheus","uid":"prometheus"}, "targets": [ {"expr": "rate(redis_evicted_keys_total[5m])", "refId": "A", "legendFormat": "evicted/sec"}, {"expr": "rate(redis_expired_keys_total[5m])", "refId": "B", "legendFormat": "expired/sec"} ]},
+    {"type": "timeseries", "title": "Rejected Connections", "id": 8, "gridPos": {"h":6,"w":8,"x":24,"y":6}, "datasource":{"type":"prometheus","uid":"prometheus"}, "targets": [{"expr": "increase(redis_rejected_connections_total[15m])", "refId": "A", "legendFormat": "rejected (15m)"}]}
+  ],
+  "time": {"from": "now-1h", "to": "now"}
+}

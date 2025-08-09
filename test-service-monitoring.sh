@@ -194,6 +194,8 @@ echo ""
 echo "🎯 New Dashboard Available:"
 echo "   Service Monitoring: http://localhost:3000/d/service-monitoring/service-monitoring-postgresql-redis-rabbitmq"
 echo "   PostgreSQL Overview: http://localhost:3000/d/postgres-overview/postgresql-overview"
+echo "   Redis Overview: http://localhost:3000/d/redis-overview/redis-overview"
+echo "   RabbitMQ Overview: http://localhost:3000/d/rabbitmq-overview/rabbitmq-overview"
 
 echo ""
 echo "✅ Service monitoring setup complete!"

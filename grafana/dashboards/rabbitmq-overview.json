@@ -1,0 +1,20 @@
+{
+  "id": null,
+  "uid": "rabbitmq-overview",
+  "title": "RabbitMQ Overview",
+  "tags": ["mq", "rabbitmq"],
+  "schemaVersion": 36,
+  "version": 1,
+  "refresh": "30s",
+  "panels": [
+    {"type": "stat", "title": "RabbitMQ Up", "id": 1, "gridPos": {"h":4,"w":4,"x":0,"y":0}, "datasource": {"type":"prometheus","uid":"prometheus"}, "targets": [{"expr": "rabbitmq_up", "refId": "A"}]},
+    {"type": "timeseries", "title": "Connections", "id": 2, "gridPos": {"h":6,"w":8,"x":4,"y":0}, "datasource": {"type":"prometheus","uid":"prometheus"}, "targets": [{"expr": "rabbitmq_connections", "refId": "A", "legendFormat": "connections"}]},
+    {"type": "timeseries", "title": "Queues Messages", "id": 3, "gridPos": {"h":6,"w":8,"x":12,"y":0}, "datasource": {"type":"prometheus","uid":"prometheus"}, "targets": [{"expr": "rabbitmq_queue_messages", "refId": "A", "legendFormat": "{{queue}}"}]},
+    {"type": "timeseries", "title": "Publish / Deliver Rates", "id": 4, "gridPos": {"h":6,"w":8,"x":20,"y":0}, "datasource": {"type":"prometheus","uid":"prometheus"}, "targets": [{"expr": "rate(rabbitmq_queue_messages_published_total[5m])", "refId": "A", "legendFormat": "publish - {{queue}}"}, {"expr": "rate(rabbitmq_queue_messages_delivered_total[5m])", "refId": "B", "legendFormat": "deliver - {{queue}}"}]},
+    {"type": "timeseries", "title": "Memory Usage %", "id": 5, "gridPos": {"h":6,"w":8,"x":0,"y":6}, "datasource": {"type":"prometheus","uid":"prometheus"}, "targets": [{"expr": "(rabbitmq_node_mem_used / rabbitmq_node_mem_limit) * 100", "refId": "A", "legendFormat": "% used"}], "fieldConfig": {"defaults": {"unit": "percent"}}},
+    {"type": "timeseries", "title": "Disk Free Ratio", "id": 6, "gridPos": {"h":6,"w":8,"x":8,"y":6}, "datasource": {"type":"prometheus","uid":"prometheus"}, "targets": [{"expr": "rabbitmq_node_disk_free / rabbitmq_node_disk_free_limit", "refId": "A", "legendFormat": "disk free ratio"}]},
+    {"type": "timeseries", "title": "File Descriptors %", "id": 7, "gridPos": {"h":6,"w":8,"x":16,"y":6}, "datasource": {"type":"prometheus","uid":"prometheus"}, "targets": [{"expr": "(rabbitmq_node_fd_used / rabbitmq_node_fd_total) * 100", "refId": "A", "legendFormat": "fd %"}], "fieldConfig": {"defaults": {"unit": "percent"}}},
+    {"type": "timeseries", "title": "Consumers per Queue", "id": 8, "gridPos": {"h":6,"w":8,"x":24,"y":6}, "datasource": {"type":"prometheus","uid":"prometheus"}, "targets": [{"expr": "rabbitmq_queue_consumers", "refId": "A", "legendFormat": "{{queue}}"}]}
+  ],
+  "time": {"from": "now-1h", "to": "now"}
+}
