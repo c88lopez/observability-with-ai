@@ -68,3 +68,4 @@ certs/*.pem
 # Local binaries from rabbitmq-tools
 rabbitmq-tools/producer
 rabbitmq-tools/consumer
+rabbitmq-tools/rabbitmq-tools
