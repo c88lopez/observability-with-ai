@@ -52,3 +52,19 @@ certs/*.pem
 **/secrets/
 **/*.secret
 **/*.key
+
+# Go build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Go module sum cache (retain go.sum for reproducibility)
+# (Not ignoring go.sum)
+
+# Local binaries from rabbitmq-tools
+rabbitmq-tools/producer
+rabbitmq-tools/consumer
