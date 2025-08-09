@@ -8,32 +8,13 @@
   "refresh": "30s",
   "panels": [
     {"type": "stat", "title": "MongoDB Up", "id": 1, "gridPos": {"h":4,"w":4,"x":0,"y":0}, "datasource": {"type":"prometheus","uid":"prometheus"}, "targets": [{"expr": "mongodb_up", "refId": "A"}]},
-    {"type": "timeseries", "title": "Connections", "id": 2, "gridPos": {"h":6,"w":8,"x":4,"y":0}, "datasource": {"type":"prometheus","uid":"prometheus"}, "targets": [{"expr": "mongodb_connections{state=\"current\"}", "refId": "A", "legendFormat": "current"}]},
-    {"type": "timeseries", "title": "Opcounters (Insert/Update/Delete)", "id": 3, "gridPos": {"h":6,"w":12,"x":12,"y":0}, "datasource": {"type":"prometheus","uid":"prometheus"}, "targets": [
-      {"expr": "rate(mongodb_op_counters_insert_total[5m])", "refId": "A", "legendFormat": "insert"},
-      {"expr": "rate(mongodb_op_counters_update_total[5m])", "refId": "B", "legendFormat": "update"},
-      {"expr": "rate(mongodb_op_counters_delete_total[5m])", "refId": "C", "legendFormat": "delete"}
-    ]},
-    {"type": "timeseries", "title": "Document Operations (Query/GetMore)", "id": 4, "gridPos": {"h":6,"w":12,"x":24,"y":0}, "datasource": {"type":"prometheus","uid":"prometheus"}, "targets": [
-      {"expr": "rate(mongodb_op_counters_query_total[5m])", "refId": "A", "legendFormat": "query"},
-      {"expr": "rate(mongodb_op_counters_getmore_total[5m])", "refId": "B", "legendFormat": "getmore"}
-    ]},
-    {"type": "timeseries", "title": "Cache Utilization %", "id": 5, "gridPos": {"h":6,"w":8,"x":0,"y":6}, "datasource": {"type":"prometheus","uid":"prometheus"}, "targets": [{"expr": "(mongodb_mongod_wiredtiger_cache_bytes_currently_in_cache / mongodb_mongod_wiredtiger_cache_maximum_bytes_configured) * 100", "refId": "A", "legendFormat": "% used"}], "fieldConfig": {"defaults": {"unit": "percent"}}},
-    {"type": "timeseries", "title": "Queued Operations", "id": 6, "gridPos": {"h":6,"w":8,"x":8,"y":6}, "datasource": {"type":"prometheus","uid":"prometheus"}, "targets": [{"expr": "mongodb_mongod_global_lock_current_queue{type=~\"reader|writer\"}", "refId": "A", "legendFormat": "{{type}}"}]},
-    {"type": "timeseries", "title": "Replication Optime (Primary vs Secondary)", "id": 7, "gridPos": {"h":6,"w":16,"x":16,"y":6}, "datasource": {"type":"prometheus","uid":"prometheus"}, "targets": [
-      {"expr": "mongodb_mongod_replset_member_optime_date{state=\"PRIMARY\"}", "refId": "A", "legendFormat": "primary"},
-      {"expr": "mongodb_mongod_replset_member_optime_date{state=\"SECONDARY\"}", "refId": "B", "legendFormat": "secondary"}
-    ]},
-    {"type": "timeseries", "title": "Network Bytes (In/Out)", "id": 8, "gridPos": {"h":6,"w":12,"x":0,"y":12}, "datasource": {"type":"prometheus","uid":"prometheus"}, "targets": [
-      {"expr": "rate(mongodb_network_bytes_in_total[5m])", "refId": "A", "legendFormat": "bytes_in"},
-      {"expr": "rate(mongodb_network_bytes_out_total[5m])", "refId": "B", "legendFormat": "bytes_out"}
-    ], "fieldConfig": {"defaults": {"unit": "Bps"}}},
-    {"type": "timeseries", "title": "Page Faults", "id": 9, "gridPos": {"h":6,"w":8,"x":12,"y":12}, "datasource": {"type":"prometheus","uid":"prometheus"}, "targets": [{"expr": "rate(mongodb_extra_info_page_faults_total[5m])", "refId": "A", "legendFormat": "page faults/sec"}]},
-    {"type": "timeseries", "title": "TTL Passes", "id": 10, "gridPos": {"h":6,"w":8,"x":20,"y":12}, "datasource": {"type":"prometheus","uid":"prometheus"}, "targets": [{"expr": "rate(mongodb_mongod_ttl_passes_total[5m])", "refId": "A", "legendFormat": "ttl passes/sec"}]},
-    {"type": "timeseries", "title": "Locks Time % (R/W)", "id": 11, "gridPos": {"h":6,"w":12,"x":28,"y":12}, "datasource": {"type":"prometheus","uid":"prometheus"}, "targets": [
-      {"expr": "rate(mongodb_mongod_locks_time_acquiring_global_total{type=\"Read\"}[5m])", "refId": "A", "legendFormat": "read"},
-      {"expr": "rate(mongodb_mongod_locks_time_acquiring_global_total{type=\"Write\"}[5m])", "refId": "B", "legendFormat": "write"}
-    ]}
+  {"type": "timeseries", "title": "DB Objects", "id": 2, "gridPos": {"h":6,"w":8,"x":4,"y":0}, "datasource": {"type":"prometheus","uid":"prometheus"}, "targets": [{"expr": "mongodb_dbstats_objects{database=~\"test|admin\"}", "refId": "A", "legendFormat": "{{database}} objs"}]},
+  {"type": "timeseries", "title": "DB Size (Data)", "id": 3, "gridPos": {"h":6,"w":12,"x":12,"y":0}, "datasource": {"type":"prometheus","uid":"prometheus"}, "targets": [{"expr": "mongodb_dbstats_dataSize{database=~\"test|admin\"}", "refId": "A", "legendFormat": "{{database}}"}], "fieldConfig": {"defaults": {"unit": "bytes"}}},
+  {"type": "timeseries", "title": "Indexes Size", "id": 4, "gridPos": {"h":6,"w":12,"x":24,"y":0}, "datasource": {"type":"prometheus","uid":"prometheus"}, "targets": [{"expr": "mongodb_dbstats_indexSize{database=~\"test|admin\"}", "refId": "A", "legendFormat": "{{database}}"}], "fieldConfig": {"defaults": {"unit": "bytes"}}},
+  {"type": "timeseries", "title": "Collections Count", "id": 5, "gridPos": {"h":6,"w":8,"x":0,"y":6}, "datasource": {"type":"prometheus","uid":"prometheus"}, "targets": [{"expr": "mongodb_dbstats_collections{database=~\"test|admin\"}", "refId": "A", "legendFormat": "{{database}}"}]},
+  {"type": "timeseries", "title": "Asserts (User / Regular)", "id": 6, "gridPos": {"h":6,"w":8,"x":8,"y":6}, "datasource": {"type":"prometheus","uid":"prometheus"}, "targets": [ {"expr": "mongodb_ss_asserts{assert_type=\"user\"}", "refId": "A", "legendFormat": "user"}, {"expr": "mongodb_ss_asserts{assert_type=\"regular\"}", "refId": "B", "legendFormat": "regular"} ]},
+  {"type": "timeseries", "title": "Slow Query Count", "id": 7, "gridPos": {"h":6,"w":8,"x":16,"y":6}, "datasource": {"type":"prometheus","uid":"prometheus"}, "targets": [{"expr": "mongodb_profile_slow_query_count{database=~\"test|admin\"}", "refId": "A", "legendFormat": "{{database}}"}]},
+  {"type": "timeseries", "title": "FS Used Size", "id": 8, "gridPos": {"h":6,"w":12,"x":24,"y":6}, "datasource": {"type":"prometheus","uid":"prometheus"}, "targets": [{"expr": "mongodb_dbstats_fsUsedSize{database=~\"test|admin\"}", "refId": "A", "legendFormat": "{{database}}"}], "fieldConfig": {"defaults": {"unit": "bytes"}}}
   ],
   "time": {"from": "now-1h", "to": "now"}
 }

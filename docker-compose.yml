@@ -195,6 +195,9 @@ services:
       - monitoring
     depends_on:
       - mongodb
+    command:
+      - '--mongodb.uri=mongodb://mongodb:27017'
+      - '--collect-all'
 
 volumes:
   prometheus_data:
