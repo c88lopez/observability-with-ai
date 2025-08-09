@@ -170,6 +170,32 @@ services:
     depends_on:
       - rabbitmq
 
+  # MongoDB Database (optional monitoring target)
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    networks:
+      - monitoring
+    volumes:
+      - mongodb_data:/data/db
+
+  # MongoDB Exporter for database metrics
+  mongodb-exporter:
+    image: percona/mongodb_exporter:0.40.0
+    container_name: mongodb-exporter
+    restart: unless-stopped
+    environment:
+      MONGODB_URI: "mongodb://mongodb:27017"
+    ports:
+      - "9216:9216"
+    networks:
+      - monitoring
+    depends_on:
+      - mongodb
+
 volumes:
   prometheus_data:
   grafana_data:
@@ -177,6 +203,7 @@ volumes:
   postgres_data:
   redis_data:
   rabbitmq_data:
+  mongodb_data:
 
 networks:
   monitoring:

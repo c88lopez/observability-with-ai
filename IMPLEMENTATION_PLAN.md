@@ -42,16 +42,15 @@
 ## Phase 2: Service Monitoring (Week 3-4)
 
 ### 2.1 Database Monitoring
-- [x] Deploy PostgreSQL Exporter and configure monitoring
-- [ ] Set up MongoDB Exporter (optional / environment dependent)
-- [~] Create database performance dashboards (PostgreSQL dashboard added; MongoDB pending)
-- [x] Implement PostgreSQL-specific alerting rules (MongoDB pending)
+ - [x] Set up MongoDB Exporter (optional / environment dependent)
+ - [~] Create database performance dashboards (PostgreSQL & MongoDB dashboards added; template refinement pending)
+ - [x] Implement PostgreSQL-specific alerting rules (MongoDB rules added; memory heuristic refinement pending)
 
 ### 2.2 Cache and Message Queue Monitoring
-- [ ] Deploy Redis Exporter and configure monitoring
-- [ ] Set up RabbitMQ Exporter (or Kafka depending on availability)
-- [ ] Create cache and queue performance dashboards
-- [ ] Implement capacity and performance alerts
+- [x] Deploy Redis Exporter and configure monitoring
+- [x] Set up RabbitMQ Exporter (alternative Kafka path deferred)
+- [x] Create cache and queue performance dashboards (Redis & RabbitMQ overview + integrated service dashboard)
+- [x] Implement capacity and performance alerts (Redis & RabbitMQ alert rules in place)
 
 ### 2.3 Kubernetes Integration (if K8s cluster available)
 - [ ] Deploy kube-state-metrics

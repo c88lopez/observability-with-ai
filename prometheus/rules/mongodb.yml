@@ -1,0 +1,67 @@
+groups:
+  - name: mongodb-alerts
+    rules:
+      # MongoDB service down
+      - alert: MongoDBDown
+        expr: mongodb_up == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: mongodb
+        annotations:
+          summary: "MongoDB instance is down"
+          description: "MongoDB instance {{ $labels.instance }} has been down for more than 1 minute"
+
+      # High connections
+      - alert: MongoDBHighConnections
+        expr: mongodb_connections{state="current"} > 500
+        for: 5m
+        labels:
+          severity: warning
+          service: mongodb
+        annotations:
+          summary: "MongoDB high number of connections"
+          description: "MongoDB instance {{ $labels.instance }} has {{ $value }} current connections"
+
+      # Opcounters (insert/update/delete) surge
+      - alert: MongoDBHighOpCounters
+        expr: (rate(mongodb_op_counters_insert_total[5m]) + rate(mongodb_op_counters_update_total[5m]) + rate(mongodb_op_counters_delete_total[5m])) > 200
+        for: 10m
+        labels:
+          severity: info
+          service: mongodb
+        annotations:
+          summary: "MongoDB high write operation rate"
+          description: "High write op rate on {{ $labels.instance }} exceeding 200 ops/sec (current {{ $value }})"
+
+      # Replication lag (only if replication metrics available)
+      - alert: MongoDBReplicationLag
+        expr: mongodb_mongod_replset_member_optime_date{state="SECONDARY"} < on (set) (mongodb_mongod_replset_member_optime_date{state="PRIMARY"} - 60)
+        for: 5m
+        labels:
+          severity: warning
+          service: mongodb
+        annotations:
+          summary: "MongoDB replication lag"
+          description: "Replication lag > 60s on replica member in set {{ $labels.set }}"
+
+      # Storage engine cache pressure
+      - alert: MongoDBHighCachePressure
+        expr: (mongodb_mongod_wiredtiger_cache_bytes_currently_in_cache / mongodb_mongod_wiredtiger_cache_maximum_bytes_configured) * 100 > 90
+        for: 10m
+        labels:
+          severity: warning
+          service: mongodb
+        annotations:
+          summary: "MongoDB high cache utilization"
+          description: "Cache utilization > 90% on {{ $labels.instance }} ({{ $value }}%)"
+
+      # Low available memory (rough estimation using virtual memory metrics if present)
+      - alert: MongoDBLowResidentMemory
+        expr: mongodb_mongod_wiredtiger_cache_bytes_currently_in_cache > (mongodb_extra_info_page_faults_total * 0) # Placeholder to ensure syntax; refine with host metrics
+        labels:
+          severity: info
+          service: mongodb
+        annotations:
+          summary: "MongoDB memory heuristic placeholder"
+          description: "Refine memory alert once host integration is defined"
