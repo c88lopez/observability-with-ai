@@ -197,8 +197,9 @@ func runConsumer(ch *amqp.Channel, queue string, count int, ack bool, prefetch i
 }
 
 // printUsage loads USAGE.txt from the same directory (if present) and substitutes program name.
+
 func printUsage() {
-	data, err := os.ReadFile("USAGE.txt")
+	data, err := os.ReadFile("USAGE.md")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "(usage file missing) %v\n", err)
 		return
