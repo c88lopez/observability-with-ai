@@ -15,24 +15,29 @@ import (
 )
 
 // Unified RabbitMQ tool usage examples:
-//   go run . --mode=produce --queue=test_queue --count=10000
-//   go run . --mode=consume --queue=test_queue --count=10000
-//   go run . --mode=consume --queue=test_queue --count=0   (infinite)
+//
+//	go run . --mode=produce --queue=test_queue --count=10000
+//	go run . --mode=consume --queue=test_queue --count=10000
+//	go run . --mode=consume --queue=test_queue --count=0   (infinite)
+//
 // Flags:
-//   --mode produce|consume
-//   --queue queue name
-//   --routing routing key (default queue)
-//   --exchange exchange (blank=default)
-//   --count number of messages (produce: to publish, consume: to read; 0=infinite consume)
-//   --url AMQP URL
-//   --ack (consume) manual ack (default true)
-//   --prefetch (consume) prefetch count
-//   --batch (produce) progress interval
-//   --size (produce) payload size bytes (padding)
-//   --concurrency (produce) publisher goroutines
+//
+//	--mode produce|consume
+//	--queue queue name
+//	--routing routing key (default queue)
+//	--exchange exchange (blank=default)
+//	--count number of messages (produce: to publish, consume: to read; 0=infinite consume)
+//	--url AMQP URL
+//	--ack (consume) manual ack (default true)
+//	--prefetch (consume) prefetch count
+//	--batch (produce) progress interval
+//	--size (produce) payload size bytes (padding)
+//	--concurrency (produce) publisher goroutines
+//
 // Env:
-//   RABBITMQ_URL overrides --url
-//   RANDOM_SEED for deterministic randomness
+//
+//	RABBITMQ_URL overrides --url
+//	RANDOM_SEED for deterministic randomness
 func main() {
 	// Custom usage before defining flags to allow -h / --help to print richer guidance.
 	flag.Usage = func() { printUsage() }
@@ -51,24 +56,37 @@ func main() {
 		helpFlag    = flag.Bool("help", false, "show detailed usage and exit")
 	)
 	flag.Parse()
-	if *helpFlag { flag.Usage(); return }
+	if *helpFlag {
+		flag.Usage()
+		return
+	}
 
-	if envURL := os.Getenv("RABBITMQ_URL"); envURL != "" { *url = envURL }
-	if *routing == "" { *routing = *queue }
+	if envURL := os.Getenv("RABBITMQ_URL"); envURL != "" {
+		*url = envURL
+	}
+	if *routing == "" {
+		*routing = *queue
+	}
 
 	seed := time.Now().UnixNano()
 	if s := os.Getenv("RANDOM_SEED"); s != "" {
 		var parsed int64
 		fmt.Sscanf(s, "%d", &parsed)
-		if parsed != 0 { seed = parsed }
+		if parsed != 0 {
+			seed = parsed
+		}
 	}
 	rng := rand.New(rand.NewSource(seed))
 
 	conn, err := amqp.Dial(*url)
-	if err != nil { log.Fatalf("dial: %v", err) }
+	if err != nil {
+		log.Fatalf("dial: %v", err)
+	}
 	defer conn.Close()
 	ch, err := conn.Channel()
-	if err != nil { log.Fatalf("channel: %v", err) }
+	if err != nil {
+		log.Fatalf("channel: %v", err)
+	}
 	defer ch.Close()
 
 	switch strings.ToLower(*mode) {
@@ -82,8 +100,12 @@ func main() {
 }
 
 func runProducer(ch *amqp.Channel, rng *rand.Rand, exchange, routing, queue string, count, batch, size, concurrency int) {
-	if _, err := ch.QueueDeclare(queue, false, true, false, false, nil); err != nil { log.Fatalf("queue declare: %v", err) }
-	if concurrency < 1 { concurrency = 1 }
+	if _, err := ch.QueueDeclare(queue, false, true, false, false, nil); err != nil {
+		log.Fatalf("queue declare: %v", err)
+	}
+	if concurrency < 1 {
+		concurrency = 1
+	}
 	perWorker := count / concurrency
 	remainder := count % concurrency
 	log.Printf("Producing %d messages (concurrency=%d) queue=%s", count, concurrency, queue)
@@ -94,8 +116,12 @@ func runProducer(ch *amqp.Channel, rng *rand.Rand, exchange, routing, queue stri
 
 	makePayload := func(i int) []byte {
 		base := fmt.Sprintf("msg-%d-%d", i, rng.Int())
-		if size <= 0 { return []byte(base) }
-		if len(base) < size { return []byte(base + strings.Repeat("x", size-len(base))) }
+		if size <= 0 {
+			return []byte(base)
+		}
+		if len(base) < size {
+			return []byte(base + strings.Repeat("x", size-len(base)))
+		}
 		return []byte(base[:size])
 	}
 
@@ -104,9 +130,12 @@ func runProducer(ch *amqp.Channel, rng *rand.Rand, exchange, routing, queue stri
 			global := startIdx + i + 1
 			body := makePayload(global)
 			if err := ch.PublishWithContext(ctx, exchange, routing, false, false, amqp.Publishing{ContentType: "text/plain", Body: body, Timestamp: time.Now()}); err != nil {
-				errCh <- fmt.Errorf("publish worker %d idx %d: %w", worker, global, err); return
+				errCh <- fmt.Errorf("publish worker %d idx %d: %w", worker, global, err)
+				return
 			}
-			if batch > 0 && global%batch == 0 { log.Printf("worker %d published %d/%d", worker, global, count) }
+			if batch > 0 && global%batch == 0 {
+				log.Printf("worker %d published %d/%d", worker, global, count)
+			}
 		}
 		doneCh <- n
 	}
@@ -114,7 +143,9 @@ func runProducer(ch *amqp.Channel, rng *rand.Rand, exchange, routing, queue stri
 	next := 0
 	for w := 0; w < concurrency; w++ {
 		n := perWorker
-		if w == concurrency-1 { n += remainder }
+		if w == concurrency-1 {
+			n += remainder
+		}
 		go publishRange(w, next, n)
 		next += n
 	}
@@ -122,8 +153,10 @@ func runProducer(ch *amqp.Channel, rng *rand.Rand, exchange, routing, queue stri
 	published := 0
 	for published < count {
 		select {
-		case e := <-errCh: log.Fatalf("error: %v", e)
-		case n := <-doneCh: published += n
+		case e := <-errCh:
+			log.Fatalf("error: %v", e)
+		case n := <-doneCh:
+			published += n
 		}
 	}
 	dur := time.Since(start)
@@ -131,19 +164,33 @@ func runProducer(ch *amqp.Channel, rng *rand.Rand, exchange, routing, queue stri
 }
 
 func runConsumer(ch *amqp.Channel, queue string, count int, ack bool, prefetch int) {
-	if prefetch > 0 { if err := ch.Qos(prefetch, 0, false); err != nil { log.Fatalf("qos: %v", err) } }
-	if _, err := ch.QueueDeclare(queue, false, true, false, false, nil); err != nil { log.Fatalf("queue declare: %v", err) }
+	if prefetch > 0 {
+		if err := ch.Qos(prefetch, 0, false); err != nil {
+			log.Fatalf("qos: %v", err)
+		}
+	}
+	if _, err := ch.QueueDeclare(queue, false, true, false, false, nil); err != nil {
+		log.Fatalf("queue declare: %v", err)
+	}
 	autoAck := !ack
 	msgs, err := ch.Consume(queue, "", autoAck, false, false, false, nil)
-	if err != nil { log.Fatalf("consume: %v", err) }
+	if err != nil {
+		log.Fatalf("consume: %v", err)
+	}
 	log.Printf("Consuming queue=%s target=%d ack=%v prefetch=%d", queue, count, ack, prefetch)
 	start := time.Now()
 	received := 0
 	for m := range msgs {
 		received++
-		if ack { _ = m.Ack(false) }
-		if received%1000 == 0 { log.Printf("consumed %d", received) }
-		if count > 0 && received >= count { break }
+		if ack {
+			_ = m.Ack(false)
+		}
+		if received%1000 == 0 {
+			log.Printf("consumed %d", received)
+		}
+		if count > 0 && received >= count {
+			break
+		}
 	}
 	dur := time.Since(start)
 	log.Printf("✅ Consumed %d messages in %s (%.0f msg/s)", received, dur, float64(received)/dur.Seconds())
