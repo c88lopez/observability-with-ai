@@ -1,0 +1,79 @@
+groups:
+  - name: redis-alerts
+    rules:
+      # Redis service down
+      - alert: RedisDown
+        expr: redis_up == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: redis
+        annotations:
+          summary: "Redis instance is down"
+          description: "Redis instance on {{ $labels.instance }} has been down for more than 1 minute"
+
+      # High memory usage
+      - alert: RedisHighMemoryUsage
+        expr: (redis_memory_used_bytes / redis_memory_max_bytes) * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+          service: redis
+        annotations:
+          summary: "Redis high memory usage"
+          description: "Redis instance {{ $labels.instance }} is using {{ $value }}% of available memory"
+
+      # Low hit ratio
+      - alert: RedisLowHitRatio
+        expr: (redis_keyspace_hits_total / (redis_keyspace_hits_total + redis_keyspace_misses_total)) * 100 < 80
+        for: 10m
+        labels:
+          severity: warning
+          service: redis
+        annotations:
+          summary: "Redis low hit ratio"
+          description: "Redis hit ratio on {{ $labels.instance }} is {{ $value }}% (should be > 80%)"
+
+      # Too many connections
+      - alert: RedisTooManyConnections
+        expr: redis_connected_clients > 200
+        for: 5m
+        labels:
+          severity: warning
+          service: redis
+        annotations:
+          summary: "Redis too many connections"
+          description: "Redis instance {{ $labels.instance }} has {{ $value }} connected clients"
+
+      # High CPU usage
+      - alert: RedisHighCPUUsage
+        expr: rate(redis_cpu_sys_seconds_total[5m]) + rate(redis_cpu_user_seconds_total[5m]) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          service: redis
+        annotations:
+          summary: "Redis high CPU usage"
+          description: "Redis instance {{ $labels.instance }} CPU usage is {{ $value | humanizePercentage }}"
+
+      # Rejected connections
+      - alert: RedisRejectedConnections
+        expr: increase(redis_rejected_connections_total[1h]) > 0
+        for: 1m
+        labels:
+          severity: warning
+          service: redis
+        annotations:
+          summary: "Redis rejecting connections"
+          description: "Redis instance {{ $labels.instance }} has rejected {{ $value }} connections in the last hour"
+
+      # High number of blocking operations
+      - alert: RedisHighBlockingOperations
+        expr: redis_blocked_clients > 10
+        for: 5m
+        labels:
+          severity: warning
+          service: redis
+        annotations:
+          summary: "Redis high number of blocking operations"
+          description: "Redis instance {{ $labels.instance }} has {{ $value }} blocked clients"

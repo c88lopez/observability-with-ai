@@ -1,0 +1,101 @@
+groups:
+  - name: rabbitmq-alerts
+    rules:
+      # RabbitMQ service down
+      - alert: RabbitMQDown
+        expr: rabbitmq_up == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: rabbitmq
+        annotations:
+          summary: "RabbitMQ instance is down"
+          description: "RabbitMQ instance on {{ $labels.instance }} has been down for more than 1 minute"
+
+      # High queue length
+      - alert: RabbitMQHighQueueLength
+        expr: rabbitmq_queue_messages > 1000
+        for: 5m
+        labels:
+          severity: warning
+          service: rabbitmq
+        annotations:
+          summary: "RabbitMQ high queue length"
+          description: "Queue {{ $labels.queue }} on {{ $labels.instance }} has {{ $value }} messages"
+
+      # High memory usage
+      - alert: RabbitMQHighMemoryUsage
+        expr: (rabbitmq_node_mem_used / rabbitmq_node_mem_limit) * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+          service: rabbitmq
+        annotations:
+          summary: "RabbitMQ high memory usage"
+          description: "RabbitMQ node {{ $labels.instance }} is using {{ $value }}% of available memory"
+
+      # High disk usage
+      - alert: RabbitMQHighDiskUsage
+        expr: (rabbitmq_node_disk_free / rabbitmq_node_disk_free_limit) < 1.2
+        for: 5m
+        labels:
+          severity: warning
+          service: rabbitmq
+        annotations:
+          summary: "RabbitMQ high disk usage"
+          description: "RabbitMQ node {{ $labels.instance }} disk usage is approaching the limit"
+
+      # Too many connections
+      - alert: RabbitMQTooManyConnections
+        expr: rabbitmq_connections > 500
+        for: 5m
+        labels:
+          severity: warning
+          service: rabbitmq
+        annotations:
+          summary: "RabbitMQ too many connections"
+          description: "RabbitMQ instance {{ $labels.instance }} has {{ $value }} connections"
+
+      # Queue consumer down
+      - alert: RabbitMQQueueNoConsumers
+        expr: rabbitmq_queue_consumers == 0 and rabbitmq_queue_messages > 0
+        for: 10m
+        labels:
+          severity: warning
+          service: rabbitmq
+        annotations:
+          summary: "RabbitMQ queue has no consumers"
+          description: "Queue {{ $labels.queue }} on {{ $labels.instance }} has messages but no consumers"
+
+      # High message publish rate
+      - alert: RabbitMQHighPublishRate
+        expr: rate(rabbitmq_queue_messages_published_total[5m]) > 100
+        for: 10m
+        labels:
+          severity: info
+          service: rabbitmq
+        annotations:
+          summary: "RabbitMQ high message publish rate"
+          description: "Queue {{ $labels.queue }} on {{ $labels.instance }} is receiving {{ $value }} messages/sec"
+
+      # Node not running
+      - alert: RabbitMQNodeNotRunning
+        expr: rabbitmq_node_running == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: rabbitmq
+        annotations:
+          summary: "RabbitMQ node not running"
+          description: "RabbitMQ node {{ $labels.instance }} is not running"
+
+      # File descriptors usage
+      - alert: RabbitMQFileDescriptorsUsage
+        expr: (rabbitmq_node_fd_used / rabbitmq_node_fd_total) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: rabbitmq
+        annotations:
+          summary: "RabbitMQ high file descriptors usage"
+          description: "RabbitMQ node {{ $labels.instance }} is using {{ $value }}% of available file descriptors"

@@ -42,10 +42,10 @@
 ## Phase 2: Service Monitoring (Week 3-4)
 
 ### 2.1 Database Monitoring
-- [ ] Deploy PostgreSQL Exporter and configure monitoring
-- [ ] Set up MongoDB Exporter (if available)
-- [ ] Create database performance dashboards
-- [ ] Implement database-specific alerting rules
+- [x] Deploy PostgreSQL Exporter and configure monitoring
+- [ ] Set up MongoDB Exporter (optional / environment dependent)
+- [~] Create database performance dashboards (PostgreSQL dashboard added; MongoDB pending)
+- [x] Implement PostgreSQL-specific alerting rules (MongoDB pending)
 
 ### 2.2 Cache and Message Queue Monitoring
 - [ ] Deploy Redis Exporter and configure monitoring

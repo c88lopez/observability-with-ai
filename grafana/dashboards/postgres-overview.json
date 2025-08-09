@@ -1,0 +1,103 @@
+{
+  "id": null,
+  "uid": "postgres-overview",
+  "title": "PostgreSQL Overview",
+  "tags": ["database", "postgres"],
+  "timezone": "",
+  "schemaVersion": 36,
+  "version": 1,
+  "refresh": "30s",
+  "style": "dark",
+  "editable": true,
+  "panels": [
+    {
+      "type": "stat",
+      "title": "PostgreSQL Up",
+      "id": 1,
+      "gridPos": {"h": 4, "w": 4, "x": 0, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "pg_up", "refId": "A"}],
+      "fieldConfig": {"defaults": {"thresholds": {"mode": "absolute", "steps": [{"color": "red", "value": null}, {"color": "green", "value": 1}]}}}
+    },
+    {
+      "type": "timeseries",
+      "title": "Active Connections",
+      "id": 2,
+      "gridPos": {"h": 6, "w": 8, "x": 4, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "pg_stat_database_numbackends", "legendFormat": "{{datname}}", "refId": "A"}]
+    },
+    {
+      "type": "timeseries",
+      "title": "Connection Usage %",
+      "id": 3,
+      "gridPos": {"h": 6, "w": 8, "x": 12, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "(pg_stat_database_numbackends / pg_settings_max_connections) * 100", "legendFormat": "Usage %", "refId": "A"}],
+      "fieldConfig": {"defaults": {"unit": "percent", "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "orange", "value": 70}, {"color": "red", "value": 85}]}}}
+    },
+    {
+      "type": "timeseries",
+      "title": "Transactions per Second",
+      "id": 4,
+      "gridPos": {"h": 6, "w": 8, "x": 0, "y": 4},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {"expr": "rate(pg_stat_database_xact_commit[5m])", "legendFormat": "Commit - {{datname}}", "refId": "A"},
+        {"expr": "rate(pg_stat_database_xact_rollback[5m])", "legendFormat": "Rollback - {{datname}}", "refId": "B"}
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Tuples Activity",
+      "id": 5,
+      "gridPos": {"h": 6, "w": 8, "x": 8, "y": 4},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {"expr": "rate(pg_stat_database_tup_returned[5m])", "legendFormat": "Returned - {{datname}}", "refId": "A"},
+        {"expr": "rate(pg_stat_database_tup_fetched[5m])", "legendFormat": "Fetched - {{datname}}", "refId": "B"},
+        {"expr": "rate(pg_stat_database_tup_inserted[5m])", "legendFormat": "Inserted - {{datname}}", "refId": "C"},
+        {"expr": "rate(pg_stat_database_tup_updated[5m])", "legendFormat": "Updated - {{datname}}", "refId": "D"},
+        {"expr": "rate(pg_stat_database_tup_deleted[5m])", "legendFormat": "Deleted - {{datname}}", "refId": "E"}
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Cache Hit Ratio %",
+      "id": 6,
+      "gridPos": {"h": 6, "w": 8, "x": 16, "y": 4},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "(pg_stat_database_blks_hit / (pg_stat_database_blks_hit + pg_stat_database_blks_read)) * 100", "legendFormat": "{{datname}}", "refId": "A"}],
+      "fieldConfig": {"defaults": {"unit": "percent", "thresholds": {"mode": "absolute", "steps": [{"color": "red", "value": null}, {"color": "orange", "value": 90}, {"color": "green", "value": 95}]}}}
+    },
+    {
+      "type": "timeseries",
+      "title": "Database Size (bytes)",
+      "id": 7,
+      "gridPos": {"h": 6, "w": 8, "x": 0, "y": 10},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "pg_database_size_bytes", "legendFormat": "{{datname}}", "refId": "A"}],
+      "fieldConfig": {"defaults": {"unit": "bytes"}}
+    },
+    {
+      "type": "timeseries",
+      "title": "Deadlocks per Hour",
+      "id": 8,
+      "gridPos": {"h": 6, "w": 8, "x": 8, "y": 10},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "increase(pg_stat_database_deadlocks[1h])", "legendFormat": "{{datname}}", "refId": "A"}]
+    },
+    {
+      "type": "timeseries",
+      "title": "Long Running Transactions (s)",
+      "id": 9,
+      "gridPos": {"h": 6, "w": 8, "x": 16, "y": 10},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "pg_stat_activity_max_tx_duration", "legendFormat": "Max Tx Duration", "refId": "A"}],
+      "fieldConfig": {"defaults": {"unit": "s"}}
+    }
+  ],
+  "time": {"from": "now-1h", "to": "now"},
+  "templating": {"list": []},
+  "annotations": {"list": []}
+}

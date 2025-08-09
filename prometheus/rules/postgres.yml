@@ -1,0 +1,68 @@
+groups:
+  - name: postgres-alerts
+    rules:
+      # PostgreSQL service down
+      - alert: PostgreSQLDown
+        expr: pg_up == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: postgresql
+        annotations:
+          summary: "PostgreSQL instance is down"
+          description: "PostgreSQL database on {{ $labels.instance }} has been down for more than 1 minute"
+
+      # High number of connections
+      - alert: PostgreSQLHighConnections
+        expr: (pg_stat_database_numbackends / pg_settings_max_connections) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: postgresql
+        annotations:
+          summary: "PostgreSQL high connection usage"
+          description: "PostgreSQL instance {{ $labels.instance }} is using {{ $value }}% of max connections"
+
+      # Long running queries
+      - alert: PostgreSQLLongRunningQueries
+        expr: pg_stat_activity_max_tx_duration > 300
+        for: 2m
+        labels:
+          severity: warning
+          service: postgresql
+        annotations:
+          summary: "PostgreSQL long running queries detected"
+          description: "PostgreSQL instance {{ $labels.instance }} has queries running for more than 5 minutes"
+
+      # High database size growth
+      - alert: PostgreSQLDatabaseSizeGrowth
+        expr: increase(pg_database_size_bytes[1h]) > 1073741824  # 1GB
+        for: 1h
+        labels:
+          severity: warning
+          service: postgresql
+        annotations:
+          summary: "PostgreSQL database size growing rapidly"
+          description: "Database {{ $labels.datname }} on {{ $labels.instance }} has grown by {{ $value | humanize1024 }}B in the last hour"
+
+      # Deadlocks detected
+      - alert: PostgreSQLDeadlocks
+        expr: increase(pg_stat_database_deadlocks[1h]) > 0
+        for: 1m
+        labels:
+          severity: warning
+          service: postgresql
+        annotations:
+          summary: "PostgreSQL deadlocks detected"
+          description: "{{ $value }} deadlocks detected in database {{ $labels.datname }} on {{ $labels.instance }} in the last hour"
+
+      # High cache miss ratio
+      - alert: PostgreSQLLowCacheHitRatio
+        expr: (pg_stat_database_blks_hit / (pg_stat_database_blks_hit + pg_stat_database_blks_read)) * 100 < 95
+        for: 5m
+        labels:
+          severity: warning
+          service: postgresql
+        annotations:
+          summary: "PostgreSQL low cache hit ratio"
+          description: "Cache hit ratio for database {{ $labels.datname }} on {{ $labels.instance }} is {{ $value }}% (should be > 95%)"
