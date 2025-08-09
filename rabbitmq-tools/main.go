@@ -7,6 +7,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -33,6 +34,8 @@ import (
 //   RABBITMQ_URL overrides --url
 //   RANDOM_SEED for deterministic randomness
 func main() {
+	// Custom usage before defining flags to allow -h / --help to print richer guidance.
+	flag.Usage = func() { printUsage() }
 	var (
 		mode        = flag.String("mode", "produce", "mode: produce or consume")
 		queue       = flag.String("queue", "test_load_queue", "queue name")
@@ -45,8 +48,10 @@ func main() {
 		batch       = flag.Int("batch", 1000, "(produce) progress log interval")
 		size        = flag.Int("size", 0, "(produce) payload size bytes (extra padding)")
 		concurrency = flag.Int("concurrency", 1, "(produce) concurrent publisher goroutines")
+		helpFlag    = flag.Bool("help", false, "show detailed usage and exit")
 	)
 	flag.Parse()
+	if *helpFlag { flag.Usage(); return }
 
 	if envURL := os.Getenv("RABBITMQ_URL"); envURL != "" { *url = envURL }
 	if *routing == "" { *routing = *queue }
@@ -142,4 +147,20 @@ func runConsumer(ch *amqp.Channel, queue string, count int, ack bool, prefetch i
 	}
 	dur := time.Since(start)
 	log.Printf("✅ Consumed %d messages in %s (%.0f msg/s)", received, dur, float64(received)/dur.Seconds())
+}
+
+// printUsage loads USAGE.txt from the same directory (if present) and substitutes program name.
+func printUsage() {
+	data, err := os.ReadFile("USAGE.txt")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "(usage file missing) %v\n", err)
+		return
+	}
+	prog := filepath.Base(os.Args[0])
+	// Replace temporary build artifact names with a generic tool name for clarity.
+	if strings.Contains(prog, "go-build") || prog == "main" {
+		prog = "rabbitmq-tool"
+	}
+	text := strings.ReplaceAll(string(data), "{{prog}}", prog)
+	fmt.Fprint(os.Stderr, text)
 }
