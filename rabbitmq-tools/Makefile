@@ -1,7 +1,7 @@
-# Simple Makefile for rabbitmq-tool
+# Simple Makefile for rabbitmq-tools
 # Usage: make [build|run-producer|run-consumer|clean]
 
-BINARY := rabbitmq-tool
+BINARY := rabbitmq-tools
 PKG := .
 GO := go
 LDFLAGS := -s -w
